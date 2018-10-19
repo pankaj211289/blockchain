@@ -1,5 +1,8 @@
 package org.blockchain.project.models;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Transaction {
 
     private String sender;
@@ -33,5 +36,15 @@ public class Transaction {
     }
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+    
+    public JSONObject toJSONObject() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("sender", getSender());
+        jsonObject.put("recipient", getRecipient());
+        jsonObject.put("data", getData());
+        jsonObject.put("timestamp", getTimestamp());
+        
+        return jsonObject;
     }
 }

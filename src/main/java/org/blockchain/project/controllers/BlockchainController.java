@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
 import org.blockchain.project.services.BlockchainService;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +27,12 @@ public class BlockchainController {
         }
         
         @RequestMapping(value="/addTransaction", method=RequestMethod.POST)
-        public void addTransaction(@RequestBody Transaction transaction) {
+        public void addTransaction(@RequestBody Transaction transaction) throws JSONException, IOException {
         	blockchainService.addTransaction(transaction);
+        }
+        
+        @RequestMapping(value="/mine", method=RequestMethod.POST)
+        public void addTransactionsToBlockchain() throws JSONException, IOException {
+            blockchainService.addTransactionsToBlockchain();
         }
 }
