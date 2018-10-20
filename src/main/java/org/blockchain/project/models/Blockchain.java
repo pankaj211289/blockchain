@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class Blockchain {
 
-    private List<Block> blockchain;
+    private List<Block> blockchain = new ArrayList<>();
     private List<Transaction> openTransactions = new ArrayList<>();
+    private String difficulty;
     
     public List<Block> getBlockchain() {
         return blockchain;
@@ -25,7 +26,10 @@ public class Blockchain {
         this.openTransactions.addAll(openTransactions);
     }
     
-    public void setOpenTransaction(Transaction openTransaction) {
-        this.openTransactions.add(openTransaction);
-    }
+	public String getDifficulty() {
+		return difficulty;
+	}
+	public void setDifficulty(String difficulty) {
+		this.difficulty = difficulty;
+	}
 }
