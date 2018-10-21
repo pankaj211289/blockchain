@@ -28,7 +28,7 @@ public class BlockchainController {
     }
     
     @RequestMapping(value="/addTransaction", method=RequestMethod.POST)
-    public void addTransaction(@RequestBody Transaction transaction) throws JSONException, IOException {
+    public void addTransaction(@RequestBody Transaction transaction) throws JSONException, IOException, NoSuchAlgorithmException {
     	blockchainService.addTransaction(transaction);
     }
     

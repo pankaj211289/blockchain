@@ -104,9 +104,7 @@ public class UtilImpl implements Util {
     	List<String> hashedTransactionList = new ArrayList<>();
     	
     	for(Transaction transaction: transactions) {
-    		String transactionStringRepresentation = transaction.getSender().toString() + transaction.getRecipient().toString()
-    				+ transaction.getData().toString() + transaction.getTimestamp().toString();
-    		hashedTransactionList.add(this.createSHA256(transactionStringRepresentation));
+    		hashedTransactionList.add(transaction.getTxHash());
     	}
     	
     	return hashedTransactionList;

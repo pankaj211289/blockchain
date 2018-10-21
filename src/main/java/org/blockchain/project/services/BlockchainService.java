@@ -11,7 +11,7 @@ public interface BlockchainService {
 
     public String displayBlockchain() throws IOException;
     
-    public void addTransaction(Transaction transaction) throws JSONException, IOException;
+    public void addTransaction(Transaction transaction) throws JSONException, IOException, NoSuchAlgorithmException;
     
     public void addTransactionsToBlockchain() throws NoSuchAlgorithmException, IOException;
     

@@ -9,6 +9,7 @@ public class Transaction {
     private String recipient;
     private String data;
     private String timestamp;
+    private String txHash;
     
     public String getSender() {
         return sender;
@@ -38,13 +39,26 @@ public class Transaction {
         this.timestamp = timestamp;
     }
     
+    public String getTxHash() {
+		return txHash;
+	}
+	public void setTxHash(String txHash) {
+		this.txHash = txHash;
+	}
+    
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("sender", getSender());
         jsonObject.put("recipient", getRecipient());
         jsonObject.put("data", getData());
         jsonObject.put("timestamp", getTimestamp());
+        jsonObject.put("txHash", getTxHash());
         
         return jsonObject;
+    }
+    
+    public String toString() {
+    	return this.getSender().toString() + this.getRecipient().toString()
+    				+ this.getData().toString() + (this.getTimestamp() != null ? this.getTimestamp().toString(): "");
     }
 }

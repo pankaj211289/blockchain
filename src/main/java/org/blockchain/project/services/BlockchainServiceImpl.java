@@ -28,10 +28,12 @@ public class BlockchainServiceImpl implements BlockchainService {
     }
     
     @Override
-	public void addTransaction(Transaction transaction) throws JSONException, IOException {
+	public void addTransaction(Transaction transaction) throws JSONException, IOException, NoSuchAlgorithmException {
     	// verify transactions
     	// TODO implementation hold till wallet set up
     	
+    	transaction.setTimestamp(util.getCurrentTimestamp().toString());
+    	transaction.setTxHash(util.createSHA256(transaction.toString()));
     	blockchain.getOpenTransactions().add(transaction);
     	
     	JSONArray openTransactionsArray = new JSONArray();
