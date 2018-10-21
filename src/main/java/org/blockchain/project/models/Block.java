@@ -2,6 +2,10 @@ package org.blockchain.project.models;
 
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Block {
 
     private List<Transaction> transactions;
@@ -51,5 +55,22 @@ public class Block {
     }
     public void setHash(String hash) {
         this.hash = hash;
+    }
+    
+    public JSONObject toJSONObject() throws JSONException {
+    	JSONObject block = new JSONObject();
+    	
+    	JSONArray transactions = new JSONArray();
+    	for(Transaction transaction: getTransactions()) {
+    		transactions.put(transaction.toJSONObject());
+    	}
+    	block.put("transactions", transactions);
+    	block.put("height", getHeight());
+    	block.put("nonce", getNonce());
+    	block.put("timestamp", getTimestamp());
+    	block.put("previousBlock", getPreviousBlock());
+    	block.put("hash", getHash());
+    	
+    	return block;
     }
 }

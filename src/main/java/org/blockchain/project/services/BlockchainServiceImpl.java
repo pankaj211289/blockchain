@@ -62,7 +62,12 @@ public class BlockchainServiceImpl implements BlockchainService {
     	blockchain.getOpenTransactions().clear();
     	
     	//Save blockchain and update open transaction
-    	// TODO
+    	JSONArray blockArray = new JSONArray();
+    	for(Block updatedBlock: blockchain.getBlockchain()) {
+    		blockArray.put(updatedBlock);
+    	}
+    	
+    	util.appendDataToFile(blockArray.toString().getBytes(), "blockchain.file");
     } 
     
     public void populateOpenTransactions(JSONArray jsonArray) throws JSONException {
@@ -74,6 +79,7 @@ public class BlockchainServiceImpl implements BlockchainService {
     		transaction.setRecipient(transactionJSONObj.has("recipient") ? transactionJSONObj.getString("recipient") : null);
     		transaction.setData(transactionJSONObj.has("data") ? transactionJSONObj.getString("data") : null);
     		transaction.setTimestamp(transactionJSONObj.has("timestamp") ? transactionJSONObj.getString("timestamp") : null);
+    		transaction.setTxHash(transactionJSONObj.has("txHash") ? transactionJSONObj.getString("txHash") : null);
     		
     		openTransactions.add(transaction);
     	}

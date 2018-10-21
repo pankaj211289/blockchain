@@ -102,7 +102,7 @@ public class UtilImpl implements Util {
     
     private List<String> createHashedTransactionList(List<Transaction> transactions) throws NoSuchAlgorithmException {
     	List<String> hashedTransactionList = new ArrayList<>();
-    	
+
     	for(Transaction transaction: transactions) {
     		hashedTransactionList.add(transaction.getTxHash());
     	}

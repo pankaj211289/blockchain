@@ -21,10 +21,10 @@ public class BlockchainController {
     
     @Autowired
     private Blockchain blockchain;
-
     @RequestMapping(value="/blockchain", method=RequestMethod.GET)
     public void displayBlockchain() throws IOException {
         blockchainService.displayBlockchain();
+        
     }
     
     @RequestMapping(value="/addTransaction", method=RequestMethod.POST)
