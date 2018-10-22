@@ -1,7 +1,10 @@
 package org.blockchain.project.controllers;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
@@ -21,6 +24,7 @@ public class BlockchainController {
     
     @Autowired
     private Blockchain blockchain;
+    
     @RequestMapping(value="/blockchain", method=RequestMethod.GET)
     public void displayBlockchain() throws IOException {
         blockchainService.displayBlockchain();
@@ -36,5 +40,10 @@ public class BlockchainController {
     public void addTransactionsToBlockchain() throws JSONException, IOException, NoSuchAlgorithmException {
     	blockchain.setDifficulty("00");
         blockchainService.addTransactionsToBlockchain();
+    }
+    
+    @RequestMapping(value="/createWallet", method=RequestMethod.POST)
+    public void createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        blockchainService.cerateWallet();
     }
 }

@@ -1,7 +1,10 @@
 package org.blockchain.project.services;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.util.List;
 
 import org.blockchain.project.models.Block;
@@ -73,6 +76,7 @@ public class BlockchainServiceImpl implements BlockchainService {
     	util.appendDataToFile("".toString().getBytes(), "open.transactions.file");
     } 
     
+    @Override
     public void populateOpenTransactions(JSONArray jsonArray) throws JSONException {
     	List<Transaction> openTransactions = blockchain.getOpenTransactions();
     	for(int i = 0; i < jsonArray.length(); i++) {
@@ -86,6 +90,11 @@ public class BlockchainServiceImpl implements BlockchainService {
     		
     		openTransactions.add(transaction);
     	}
+    }
+    
+    @Override
+    public void cerateWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        util.createWallet();
     }
     
     private Block createGenesisBlock() throws NoSuchAlgorithmException {

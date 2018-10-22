@@ -1,22 +1,35 @@
 package org.blockchain.project.services;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Security;
+import java.security.spec.ECGenParameterSpec;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.blockchain.project.models.Block;
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -33,15 +46,18 @@ public class UtilImpl implements Util {
 		this.blockchain = blockchain;
 	}
     
+    @Override
 	public String createSHA256(String textToHash) throws NoSuchAlgorithmException {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
         return Base64.getEncoder().encodeToString(messageDigest.digest(textToHash.getBytes(StandardCharsets.UTF_8)));
     }
     
+    @Override
     public Timestamp getCurrentTimestamp() {
         return new Timestamp(System.currentTimeMillis());
     } 
     
+    @Override
     public String readFile(String property) throws IOException {
         Path filePath = Paths.get(environment.getProperty(property));
         
@@ -55,16 +71,42 @@ public class UtilImpl implements Util {
         return null;
     }
 
+    @Override
     public void appendDataToFile(byte[] content, String property) throws IOException {
         Path filePath = Paths.get(environment.getProperty(property));
         Files.write(filePath, content, StandardOpenOption.TRUNCATE_EXISTING);
     }
     
+    @Override
     public Block adjustNonce(Block block) throws NoSuchAlgorithmException {
     	 while(!hashedBlock(block).getHash().startsWith(blockchain.getDifficulty())) {
     		 block.setNonce(block.getNonce() + 1);
     	 }
     	 return block;
+    }
+    
+    @Override
+    public Map<PublicKey, PrivateKey> createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        Security.addProvider(new BouncyCastleProvider());
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDSA","BC");
+        SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+        ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("prime192v1");
+        
+        keyPairGenerator.initialize(ecGenParameterSpec, secureRandom);
+        
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+        
+        ////
+        Base64.getEncoder().encodeToString(publicKey.getEncoded());
+        ////
+        
+        Map<PublicKey, PrivateKey> wallet = new HashMap<>();
+        wallet.put(publicKey, privateKey);
+        
+        return wallet;
     }
     
     private Block hashedBlock(Block block) throws NoSuchAlgorithmException {
