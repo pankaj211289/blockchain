@@ -21,14 +21,13 @@ import java.security.spec.ECGenParameterSpec;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import org.blockchain.project.models.Block;
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
+import org.blockchain.project.models.Wallet;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -86,7 +85,7 @@ public class UtilImpl implements Util {
     }
     
     @Override
-    public Map<PublicKey, PrivateKey> createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+    public Wallet createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
         Security.addProvider(new BouncyCastleProvider());
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDSA","BC");
         SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
@@ -99,12 +98,9 @@ public class UtilImpl implements Util {
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
         
-        ////
-        Base64.getEncoder().encodeToString(publicKey.getEncoded());
-        ////
-        
-        Map<PublicKey, PrivateKey> wallet = new HashMap<>();
-        wallet.put(publicKey, privateKey);
+        Wallet wallet = new Wallet();
+        wallet.setPrivateKey(privateKey);
+        wallet.setPublicKey(publicKey);
         
         return wallet;
     }

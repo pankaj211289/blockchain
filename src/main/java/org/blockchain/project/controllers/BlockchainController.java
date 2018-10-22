@@ -5,11 +5,14 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.util.Base64;
 
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
+import org.blockchain.project.models.Wallet;
 import org.blockchain.project.services.BlockchainService;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +46,12 @@ public class BlockchainController {
     }
     
     @RequestMapping(value="/createWallet", method=RequestMethod.POST)
-    public void createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
-        blockchainService.cerateWallet();
+    public String createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        Wallet wallet = blockchainService.cerateWallet();
+        
+        JSONObject walletJSONObj = new JSONObject();
+        walletJSONObj.put("publicKey", Base64.getEncoder().encodeToString(wallet.getPublicKey().getEncoded()));
+        walletJSONObj.put("privateKey", Base64.getEncoder().encodeToString(wallet.getPrivateKey().getEncoded()));
+        return walletJSONObj.toString();
     }
 }

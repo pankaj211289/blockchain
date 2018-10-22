@@ -10,6 +10,7 @@ import java.util.List;
 import org.blockchain.project.models.Block;
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
+import org.blockchain.project.models.Wallet;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,8 +94,8 @@ public class BlockchainServiceImpl implements BlockchainService {
     }
     
     @Override
-    public void cerateWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
-        util.createWallet();
+    public Wallet cerateWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+        return util.createWallet();
     }
     
     private Block createGenesisBlock() throws NoSuchAlgorithmException {

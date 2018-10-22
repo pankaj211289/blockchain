@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 import org.blockchain.project.models.Transaction;
+import org.blockchain.project.models.Wallet;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -20,5 +21,5 @@ public interface BlockchainService {
     
     public void populateOpenTransactions(JSONArray jsonArray) throws JSONException;
     
-    public void cerateWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException;
+    public Wallet cerateWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException;
 }
