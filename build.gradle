@@ -23,7 +23,6 @@ repositories {
 	mavenCentral()
 }
 
-
 dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-data-rest')
 	implementation('org.springframework.boot:spring-boot-starter-web')
@@ -31,4 +30,5 @@ dependencies {
 	
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
 	compile group: 'org.bouncycastle', name: 'bcprov-jdk16', version: '1.46'
+	compile group: 'org.json', name: 'json', version: '20180813'
 }
