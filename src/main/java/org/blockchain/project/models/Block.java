@@ -61,10 +61,12 @@ public class Block {
     	JSONObject block = new JSONObject();
     	
     	JSONArray transactions = new JSONArray();
-    	for(Transaction transaction: getTransactions()) {
-    		transactions.put(transaction.toJSONObject());
+    	if(getTransactions() != null) {
+        	for(Transaction transaction: getTransactions()) {
+        		transactions.put(transaction.toJSONObject());
+        	}
     	}
-    	block.put("transactions", transactions);
+    	block.put("transactions", transactions.length() == 0? null: transactions);
     	block.put("height", getHeight());
     	block.put("nonce", getNonce());
     	block.put("timestamp", getTimestamp());

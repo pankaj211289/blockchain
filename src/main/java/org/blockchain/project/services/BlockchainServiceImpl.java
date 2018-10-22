@@ -44,7 +44,7 @@ public class BlockchainServiceImpl implements BlockchainService {
 	}
     
     @Override
-    public void addTransactionsToBlockchain() throws NoSuchAlgorithmException, IOException {
+    public void addTransactionsToBlockchain() throws NoSuchAlgorithmException, IOException, JSONException {
     	if(blockchain.getBlockchain() == null || blockchain.getBlockchain().size() == 0) {
     		blockchain.getBlockchain().add(createGenesisBlock());
     	}
@@ -59,15 +59,18 @@ public class BlockchainServiceImpl implements BlockchainService {
     	util.adjustNonce(block);
     	
     	blockchain.getBlockchain().add(block);
-    	blockchain.getOpenTransactions().clear();
     	
     	//Save blockchain and update open transaction
     	JSONArray blockArray = new JSONArray();
     	for(Block updatedBlock: blockchain.getBlockchain()) {
-    		blockArray.put(updatedBlock);
+    		blockArray.put(updatedBlock.toJSONObject());
     	}
     	
     	util.appendDataToFile(blockArray.toString().getBytes(), "blockchain.file");
+    	
+    	// Clears open Transactions
+    	blockchain.getOpenTransactions().clear();
+    	util.appendDataToFile("".toString().getBytes(), "open.transactions.file");
     } 
     
     public void populateOpenTransactions(JSONArray jsonArray) throws JSONException {
