@@ -20,17 +20,20 @@ import java.security.SecureRandom;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.ECGenParameterSpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Stream;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.blockchain.project.models.Block;
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
 import org.blockchain.project.models.Wallet;
-import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -50,7 +53,7 @@ public class UtilImpl implements Util {
     @Override
 	public String createSHA256(String textToHash) throws NoSuchAlgorithmException {
         MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-        return Base64.getEncoder().encodeToString(messageDigest.digest(textToHash.getBytes(StandardCharsets.UTF_8)));
+        return Base64.toBase64String(messageDigest.digest(textToHash.getBytes(StandardCharsets.UTF_8)));
     }
     
     @Override
@@ -93,7 +96,6 @@ public class UtilImpl implements Util {
         ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("prime192v1");
         
         keyPairGenerator.initialize(ecGenParameterSpec, secureRandom);
-//        keyPairGenerator.initialize(keysize);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         
         PublicKey publicKey = keyPair.getPublic();
@@ -101,12 +103,8 @@ public class UtilImpl implements Util {
         
         Wallet wallet = new Wallet();
         
-        String hexValue = Hex.toHexString(privateKey.getEncoded());
-        System.out.println(hexValue.getBytes());
-        System.out.println(privateKey.getEncoded());
-        
-        wallet.setPrivateKey(Hex.toHexString(privateKey.getEncoded()));
-        wallet.setPublicKey(Hex.toHexString(publicKey.getEncoded()));
+        wallet.setPrivateKey(Base64.toBase64String(new PKCS8EncodedKeySpec(privateKey.getEncoded()).getEncoded()));
+        wallet.setPublicKey(Base64.toBase64String(new X509EncodedKeySpec(publicKey.getEncoded()).getEncoded()));
         
         return wallet;
     }
@@ -117,7 +115,7 @@ public class UtilImpl implements Util {
         signature.initSign(privateKey);
         signature.update(data.getBytes());
         
-        return Base64.getEncoder().encodeToString(signature.sign());
+        return Base64.toBase64String(signature.sign());
     }
     
     @Override
@@ -125,7 +123,7 @@ public class UtilImpl implements Util {
         Signature signature = Signature.getInstance("ECDSA", "BC");
         signature.initVerify(publicKey);
         signature.update(data.getBytes());
-        return signature.verify(signedData.getBytes());
+        return signature.verify(DatatypeConverter.parseBase64Binary(signedData));
     }
     
     private Block hashedBlock(Block block) throws NoSuchAlgorithmException {

@@ -8,13 +8,12 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
-import java.security.spec.ECGenParameterSpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Iterator;
 import java.util.List;
-
+import javax.xml.bind.DatatypeConverter;
 import org.blockchain.project.models.Block;
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
@@ -49,10 +48,10 @@ public class BlockchainServiceImpl implements BlockchainService {
         
         transaction.setSender(wallet.getPublicKey());
         String dataToEncrypt = transaction.getSender() + transaction.getRecipient() + transaction.getData();
-    	
+        
     	transaction.setTimestamp(util.getCurrentTimestamp().toString());
     	transaction.setTxHash(util.createSHA256(transaction.toString()));
-    	transaction.setTxSignature(util.signTransaction(keyFactory.generatePrivate(new PKCS8EncodedKeySpec(wallet.getPrivateKey().getBytes())), dataToEncrypt));
+    	transaction.setTxSignature(util.signTransaction(keyFactory.generatePrivate(new PKCS8EncodedKeySpec(DatatypeConverter.parseBase64Binary(wallet.getPrivateKey()))), dataToEncrypt));
     	blockchain.getOpenTransactions().add(transaction);
     	
     	JSONArray openTransactionsArray = new JSONArray();
@@ -75,7 +74,7 @@ public class BlockchainServiceImpl implements BlockchainService {
     	while(txIterator.hasNext()) {
     	    Transaction transaction = txIterator.next();
     	    String data = transaction.getSender() + transaction.getRecipient() + transaction.getData();
-    	    if(!util.verifySignedTransaction(keyFactory.generatePublic(new X509EncodedKeySpec(transaction.getSender().getBytes())), data, transaction.getTxSignature())) {
+    	    if(!util.verifySignedTransaction(keyFactory.generatePublic(new X509EncodedKeySpec(DatatypeConverter.parseBase64Binary(transaction.getSender()))), data, transaction.getTxSignature())) {
     	        blockchain.getOpenTransactions().remove(transaction);
     	    }
     	}

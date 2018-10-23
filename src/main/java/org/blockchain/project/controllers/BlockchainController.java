@@ -13,7 +13,6 @@ import org.blockchain.project.models.Transaction;
 import org.blockchain.project.models.Wallet;
 import org.blockchain.project.services.BlockchainService;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -53,13 +52,8 @@ public class BlockchainController {
     }
     
     @RequestMapping(value="/createWallet", method=RequestMethod.POST)
-    public String createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException, JSONException {
-        Wallet wallet = blockchainService.createWallet();
-        
-        JSONObject walletJSONObj = new JSONObject();
-        walletJSONObj.put("publicKey", wallet.getPublicKey());
-        walletJSONObj.put("privateKey", wallet.getPrivateKey());
-        return walletJSONObj.toString();
+    public Wallet createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException, JSONException {
+        return blockchainService.createWallet();
     }
     
     @RequestMapping(value="/loadWallet", method=RequestMethod.PUT)

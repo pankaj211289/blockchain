@@ -63,6 +63,7 @@ public class Transaction {
         jsonObject.put("data", getData());
         jsonObject.put("timestamp", getTimestamp());
         jsonObject.put("txHash", getTxHash());
+        jsonObject.put("txSignature", getTxSignature());
         
         return jsonObject;
     }
