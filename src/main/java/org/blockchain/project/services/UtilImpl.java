@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
@@ -16,7 +17,8 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
-import java.security.Security;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.ECGenParameterSpec;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -28,7 +30,7 @@ import org.blockchain.project.models.Block;
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
 import org.blockchain.project.models.Wallet;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -86,23 +88,44 @@ public class UtilImpl implements Util {
     
     @Override
     public Wallet createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
-        Security.addProvider(new BouncyCastleProvider());
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("ECDSA","BC");
         SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
         ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec("prime192v1");
         
         keyPairGenerator.initialize(ecGenParameterSpec, secureRandom);
-        
+//        keyPairGenerator.initialize(keysize);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
         
         Wallet wallet = new Wallet();
-        wallet.setPrivateKey(privateKey);
-        wallet.setPublicKey(publicKey);
+        
+        String hexValue = Hex.toHexString(privateKey.getEncoded());
+        System.out.println(hexValue.getBytes());
+        System.out.println(privateKey.getEncoded());
+        
+        wallet.setPrivateKey(Hex.toHexString(privateKey.getEncoded()));
+        wallet.setPublicKey(Hex.toHexString(publicKey.getEncoded()));
         
         return wallet;
+    }
+    
+    @Override
+    public String signTransaction(PrivateKey privateKey, String data) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance("ECDSA", "BC");
+        signature.initSign(privateKey);
+        signature.update(data.getBytes());
+        
+        return Base64.getEncoder().encodeToString(signature.sign());
+    }
+    
+    @Override
+    public boolean verifySignedTransaction(PublicKey publicKey, String data, String signedData) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance("ECDSA", "BC");
+        signature.initVerify(publicKey);
+        signature.update(data.getBytes());
+        return signature.verify(signedData.getBytes());
     }
     
     private Block hashedBlock(Block block) throws NoSuchAlgorithmException {

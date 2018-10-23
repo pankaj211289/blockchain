@@ -29,6 +29,7 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 	
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.7'
-	compile group: 'org.bouncycastle', name: 'bcprov-jdk16', version: '1.46'
+	//compile group: 'org.bouncycastle', name: 'bcprov-jdk16', version: '1.46'
+	compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.60'
 	compile group: 'org.json', name: 'json', version: '20180813'
 }

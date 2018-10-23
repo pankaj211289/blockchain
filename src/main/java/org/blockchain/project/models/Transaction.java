@@ -2,7 +2,9 @@ package org.blockchain.project.models;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Transaction {
 
     private String sender;
@@ -10,6 +12,7 @@ public class Transaction {
     private String data;
     private String timestamp;
     private String txHash;
+    private String txSignature;
     
     public String getSender() {
         return sender;
@@ -46,6 +49,13 @@ public class Transaction {
 		this.txHash = txHash;
 	}
     
+	public String getTxSignature() {
+        return txSignature;
+    }
+    public void setTxSignature(String txSignature) {
+        this.txSignature = txSignature;
+    }
+	
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("sender", getSender());

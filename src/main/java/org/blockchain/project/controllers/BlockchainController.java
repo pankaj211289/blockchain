@@ -3,10 +3,11 @@ package org.blockchain.project.controllers;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.Base64;
-
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
 import org.blockchain.project.models.Wallet;
@@ -28,6 +29,12 @@ public class BlockchainController {
     @Autowired
     private Blockchain blockchain;
     
+    @Autowired
+    private Transaction transaction;
+    
+    @Autowired
+    private Wallet wallet;
+    
     @RequestMapping(value="/blockchain", method=RequestMethod.GET)
     public void displayBlockchain() throws IOException {
         blockchainService.displayBlockchain();
@@ -35,23 +42,32 @@ public class BlockchainController {
     }
     
     @RequestMapping(value="/addTransaction", method=RequestMethod.POST)
-    public void addTransaction(@RequestBody Transaction transaction) throws JSONException, IOException, NoSuchAlgorithmException {
+    public void addTransaction(@RequestBody Transaction transaction) throws JSONException, IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException {
     	blockchainService.addTransaction(transaction);
     }
     
     @RequestMapping(value="/mine", method=RequestMethod.POST)
-    public void addTransactionsToBlockchain() throws JSONException, IOException, NoSuchAlgorithmException {
+    public void addTransactionsToBlockchain() throws JSONException, IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException {
     	blockchain.setDifficulty("00");
         blockchainService.addTransactionsToBlockchain();
     }
     
     @RequestMapping(value="/createWallet", method=RequestMethod.POST)
-    public String createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
-        Wallet wallet = blockchainService.cerateWallet();
+    public String createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException, JSONException {
+        Wallet wallet = blockchainService.createWallet();
         
         JSONObject walletJSONObj = new JSONObject();
-        walletJSONObj.put("publicKey", Base64.getEncoder().encodeToString(wallet.getPublicKey().getEncoded()));
-        walletJSONObj.put("privateKey", Base64.getEncoder().encodeToString(wallet.getPrivateKey().getEncoded()));
+        walletJSONObj.put("publicKey", wallet.getPublicKey());
+        walletJSONObj.put("privateKey", wallet.getPrivateKey());
         return walletJSONObj.toString();
+    }
+    
+    @RequestMapping(value="/loadWallet", method=RequestMethod.PUT)
+    public void loadWallet(@RequestBody Wallet wallet) {
+        // TODO: Test to match Public-Private Key values
+        
+        transaction.setSender(wallet.getPublicKey());
+        this.wallet.setPublicKey(wallet.getPublicKey());
+        this.wallet.setPrivateKey(wallet.getPrivateKey());
     }
 }

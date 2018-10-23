@@ -1,22 +1,23 @@
 package org.blockchain.project.models;
 
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import org.springframework.stereotype.Component;
 
+@Component
 public class Wallet {
-	private PublicKey publicKey;
-	private PrivateKey privateKey;
+	private String publicKey;
+	private String privateKey;
 	
-	public PublicKey getPublicKey() {
+    public String getPublicKey() {
 		return publicKey;
 	}
-	public void setPublicKey(PublicKey publicKey) {
+	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
 	}
-	public PrivateKey getPrivateKey() {
+	
+	public String getPrivateKey() {
 		return privateKey;
 	}
-	public void setPrivateKey(PrivateKey privateKey) {
+	public void setPrivateKey(String privateKey) {
 		this.privateKey = privateKey;
 	}
 }

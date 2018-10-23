@@ -3,8 +3,16 @@ package org.blockchain.project.services;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Iterator;
 import java.util.List;
 
 import org.blockchain.project.models.Block;
@@ -24,6 +32,9 @@ public class BlockchainServiceImpl implements BlockchainService {
     private Blockchain blockchain;
     
     @Autowired
+    private Wallet wallet;
+    
+    @Autowired
     private Util util;
     
     @Override
@@ -32,12 +43,16 @@ public class BlockchainServiceImpl implements BlockchainService {
     }
     
     @Override
-	public void addTransaction(Transaction transaction) throws JSONException, IOException, NoSuchAlgorithmException {
-    	// verify transactions
-    	// TODO implementation hold till wallet set up
+	public void addTransaction(Transaction transaction) throws JSONException, IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException {
+    	// Sign transaction
+        KeyFactory keyFactory = KeyFactory.getInstance("ECDSA","BC");
+        
+        transaction.setSender(wallet.getPublicKey());
+        String dataToEncrypt = transaction.getSender() + transaction.getRecipient() + transaction.getData();
     	
     	transaction.setTimestamp(util.getCurrentTimestamp().toString());
     	transaction.setTxHash(util.createSHA256(transaction.toString()));
+    	transaction.setTxSignature(util.signTransaction(keyFactory.generatePrivate(new PKCS8EncodedKeySpec(wallet.getPrivateKey().getBytes())), dataToEncrypt));
     	blockchain.getOpenTransactions().add(transaction);
     	
     	JSONArray openTransactionsArray = new JSONArray();
@@ -48,9 +63,21 @@ public class BlockchainServiceImpl implements BlockchainService {
 	}
     
     @Override
-    public void addTransactionsToBlockchain() throws NoSuchAlgorithmException, IOException, JSONException {
+    public void addTransactionsToBlockchain() throws NoSuchAlgorithmException, IOException, JSONException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException {
     	if(blockchain.getBlockchain() == null || blockchain.getBlockchain().size() == 0) {
     		blockchain.getBlockchain().add(createGenesisBlock());
+    	}
+    	
+    	// Verify Transactions
+    	KeyFactory keyFactory = KeyFactory.getInstance("ECDSA","BC");
+    	
+    	Iterator<Transaction> txIterator =  blockchain.getOpenTransactions().iterator();
+    	while(txIterator.hasNext()) {
+    	    Transaction transaction = txIterator.next();
+    	    String data = transaction.getSender() + transaction.getRecipient() + transaction.getData();
+    	    if(!util.verifySignedTransaction(keyFactory.generatePublic(new X509EncodedKeySpec(transaction.getSender().getBytes())), data, transaction.getTxSignature())) {
+    	        blockchain.getOpenTransactions().remove(transaction);
+    	    }
     	}
     	
     	Block previousBlock = blockchain.getBlockchain().get(blockchain.getBlockchain().size() - 1);
@@ -78,8 +105,9 @@ public class BlockchainServiceImpl implements BlockchainService {
     } 
     
     @Override
-    public void populateOpenTransactions(JSONArray jsonArray) throws JSONException {
+    public void populateOpenTransactions(JSONArray jsonArray) throws JSONException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
     	List<Transaction> openTransactions = blockchain.getOpenTransactions();
+    	
     	for(int i = 0; i < jsonArray.length(); i++) {
     		JSONObject transactionJSONObj = jsonArray.getJSONObject(i);
     		Transaction transaction = new Transaction();
@@ -94,7 +122,7 @@ public class BlockchainServiceImpl implements BlockchainService {
     }
     
     @Override
-    public Wallet cerateWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
+    public Wallet createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException {
         return util.createWallet();
     }
     
