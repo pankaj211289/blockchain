@@ -8,6 +8,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
+
+import org.blockchain.project.models.Block;
 import org.blockchain.project.models.Blockchain;
 import org.blockchain.project.models.Transaction;
 import org.blockchain.project.models.Wallet;
@@ -35,9 +38,8 @@ public class BlockchainController {
     private Wallet wallet;
     
     @RequestMapping(value="/blockchain", method=RequestMethod.GET)
-    public void displayBlockchain() throws IOException {
-        blockchainService.displayBlockchain();
-        
+    public List<Block> displayBlockchain() throws IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException {
+        return blockchainService.displayBlockchain();
     }
     
     @RequestMapping(value="/addTransaction", method=RequestMethod.POST)
@@ -56,12 +58,14 @@ public class BlockchainController {
         return blockchainService.createWallet();
     }
     
-    @RequestMapping(value="/loadWallet", method=RequestMethod.PUT)
-    public void loadWallet(@RequestBody Wallet wallet) {
+    @RequestMapping(value="/loadWallet", method=RequestMethod.POST)
+    public List<Transaction> loadWallet(@RequestBody Wallet wallet) {
         // TODO: Test to match Public-Private Key values
         
         transaction.setSender(wallet.getPublicKey());
         this.wallet.setPublicKey(wallet.getPublicKey());
         this.wallet.setPrivateKey(wallet.getPrivateKey());
+        
+        return blockchainService.getAllData(wallet.getPublicKey());
     }
 }

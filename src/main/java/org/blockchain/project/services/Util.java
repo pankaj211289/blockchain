@@ -10,8 +10,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.blockchain.project.models.Block;
+import org.blockchain.project.models.Transaction;
 import org.blockchain.project.models.Wallet;
 
 public interface Util {
@@ -31,4 +33,6 @@ public interface Util {
 	public String signTransaction(PrivateKey privateKey, String data) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
 	
 	public boolean verifySignedTransaction(PublicKey publicKey, String data, String signedData) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
+	
+	public String generateMerkelTree(List<Transaction> transactions) throws NoSuchAlgorithmException;
 }

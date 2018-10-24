@@ -126,19 +126,20 @@ public class UtilImpl implements Util {
         return signature.verify(DatatypeConverter.parseBase64Binary(signedData));
     }
     
-    private Block hashedBlock(Block block) throws NoSuchAlgorithmException {
-    	block.setHash(this.createSHA256(this.generateMerkelTree(block.getTransactions()) + block.getHeight() + block.getNonce() +
-    			block.getTimestamp() + block.getPreviousBlock()));
-    	return block;
-    }
-    
-    private String generateMerkelTree(List<Transaction> transactions) throws NoSuchAlgorithmException {
+    @Override
+    public String generateMerkelTree(List<Transaction> transactions) throws NoSuchAlgorithmException {
     	if(transactions != null) {
 	    	List<String> hashedTransactionList = createHashedTransactionList(transactions);
 	    	return merkelTree(hashedTransactionList);
     	} else {
     		return "";
     	}
+    }
+    
+    private Block hashedBlock(Block block) throws NoSuchAlgorithmException {
+    	block.setHash(this.createSHA256(block.getMerkelHash() + block.getHeight() + block.getNonce() +
+    			block.getTimestamp() + block.getPreviousBlock()));
+    	return block;
     }
     
     private String merkelTree(List<String> transactions) throws NoSuchAlgorithmException {

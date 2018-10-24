@@ -13,6 +13,7 @@ public class Transaction {
     private String timestamp;
     private String txHash;
     private String txSignature;
+    private Boolean isValid;
     
     public String getSender() {
         return sender;
@@ -55,6 +56,13 @@ public class Transaction {
     public void setTxSignature(String txSignature) {
         this.txSignature = txSignature;
     }
+    
+    public Boolean isValid() {
+		return isValid;
+	}
+	public void setValid(Boolean isValid) {
+		this.isValid = isValid;
+	}
 	
     public JSONObject toJSONObject() throws JSONException {
         JSONObject jsonObject = new JSONObject();
@@ -64,8 +72,22 @@ public class Transaction {
         jsonObject.put("timestamp", getTimestamp());
         jsonObject.put("txHash", getTxHash());
         jsonObject.put("txSignature", getTxSignature());
+        jsonObject.put("isValid", isValid());
         
         return jsonObject;
+    }
+    
+    public static Transaction init(JSONObject transactionJSONObj) {
+    	Transaction transaction = new Transaction();
+		transaction.setSender(transactionJSONObj.has("sender") ? transactionJSONObj.getString("sender") : null);
+		transaction.setRecipient(transactionJSONObj.has("recipient") ? transactionJSONObj.getString("recipient") : null);
+		transaction.setData(transactionJSONObj.has("data") ? transactionJSONObj.getString("data") : null);
+		transaction.setTimestamp(transactionJSONObj.has("timestamp") ? transactionJSONObj.getString("timestamp") : null);
+		transaction.setTxHash(transactionJSONObj.has("txHash") ? transactionJSONObj.getString("txHash") : null);
+		transaction.setTxSignature(transactionJSONObj.has("txSignature") ? transactionJSONObj.getString("txSignature") : null);
+		transaction.setValid(transactionJSONObj.has("isValid") ? transactionJSONObj.getBoolean("isValid") : null);
+		
+		return transaction;
     }
     
     public String toString() {
