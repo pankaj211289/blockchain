@@ -24,7 +24,9 @@ public interface BlockchainService {
     
     public void addTransactionsToBlockchain() throws NoSuchAlgorithmException, IOException, JSONException, NoSuchProviderException, InvalidKeyException, SignatureException, InvalidKeySpecException ;
     
-    public void populateOpenTransactions(JSONArray jsonArray) throws JSONException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException;
+    public void populateOpenTransactions(JSONArray jsonArray);
+    
+    public void populateBlockchain(JSONArray blockChainJSONArray);
     
     public Wallet createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException;
     

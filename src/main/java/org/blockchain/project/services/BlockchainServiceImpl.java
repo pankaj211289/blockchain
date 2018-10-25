@@ -50,10 +50,10 @@ public class BlockchainServiceImpl implements BlockchainService {
         	}
         	
         	for(Block block: blocks) {
-        		verifyBlock(block);
+        		block.setValid(verifyBlock(block));
         		if(block.getTransactions() != null) {
 	        		for(Transaction transaction: block.getTransactions()) {
-	        			verifyTransaction(transaction);
+	        		    transaction.setValid(verifyTransaction(transaction));
 	        		}
         		}
         	}
@@ -126,13 +126,22 @@ public class BlockchainServiceImpl implements BlockchainService {
     } 
     
     @Override
-    public void populateOpenTransactions(JSONArray jsonArray) throws JSONException, InvalidKeySpecException, NoSuchAlgorithmException, NoSuchProviderException {
+    public void populateOpenTransactions(JSONArray jsonArray) {
     	List<Transaction> openTransactions = blockchain.getOpenTransactions();
     	
     	for(int i = 0; i < jsonArray.length(); i++) {
     		JSONObject transactionJSONObj = jsonArray.getJSONObject(i);
     		openTransactions.add(Transaction.init(transactionJSONObj));
     	}
+    }
+    
+    @Override
+    public void populateBlockchain(JSONArray blockChainJSONArray) {
+        List<Block> blocks = blockchain.getBlockchain();
+        
+        for(int i = 0; i < blockChainJSONArray.length(); i++) {
+            blocks.add(Block.init(blockChainJSONArray.getJSONObject(i)));
+        }
     }
     
     @Override
@@ -145,11 +154,13 @@ public class BlockchainServiceImpl implements BlockchainService {
     	List<Transaction> userOwnedTransactions = new ArrayList<>();
     	
     	for(Block block: this.blockchain.getBlockchain()) {
-    		for(Transaction transaction: block.getTransactions()) {
-    			if(transaction.getSender().equals(publicKey)) {
-    				userOwnedTransactions.add(transaction);
-    			}
-    		}
+    	    if(block.getTransactions() != null) {
+        		for(Transaction transaction: block.getTransactions()) {
+        			if(transaction.getSender().equals(publicKey)) {
+        				userOwnedTransactions.add(transaction);
+        			}
+        		}
+    	    }
     	}
     	
     	return userOwnedTransactions;
@@ -165,7 +176,6 @@ public class BlockchainServiceImpl implements BlockchainService {
 	    	isTransactionValid = true;
 	    }
 	    
-	    transaction.setValid(isTransactionValid);
 	    return isTransactionValid;
     }
     
@@ -174,15 +184,15 @@ public class BlockchainServiceImpl implements BlockchainService {
     	boolean isBlockValid = true;
     	
     	// Validates hash as per difficulty
-    	if(!block.getHash().startsWith(this.blockchain.getDifficulty())) {
-    		isBlockValid = false;
-    	}
+//    	if(!block.getHash().startsWith(this.blockchain.getDifficulty())) {
+//    		isBlockValid = false;
+//    	}
+    	// difficulty may vary as per time, thus commenting out above LOC
     	
     	if(!util.createSHA256(block.getMerkelHash() + block.getHeight() + block.getNonce() + block.getTimestamp() + block.getPreviousBlock()).equals(block.getHash())) {
     		isBlockValid = false;
     	}
     	
-    	block.setValid(isBlockValid);
     	return isBlockValid;
     }
     
