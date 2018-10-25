@@ -30,9 +30,9 @@ public interface Util {
 	
 	public Wallet createWallet() throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException, UnsupportedEncodingException;
 	
-	public String signTransaction(PrivateKey privateKey, String data) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
+	public String signDataViaPrivateKey(PrivateKey privateKey, String data) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
 	
-	public boolean verifySignedTransaction(PublicKey publicKey, String data, String signedData) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
+	public boolean verifySignedDataViaPublicKey(PublicKey publicKey, String data, String signedData) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidKeyException, SignatureException;
 	
 	public String generateMerkelTree(List<Transaction> transactions) throws NoSuchAlgorithmException;
 }

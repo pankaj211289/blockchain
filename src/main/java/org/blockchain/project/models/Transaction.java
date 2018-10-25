@@ -15,6 +15,22 @@ public class Transaction {
     private String txSignature;
     private Boolean isValid;
     
+    public Transaction() {}
+    
+    public Transaction(String sender, String recipient, String data, String timestamp, String txHash, String txSignature, Boolean isValid) {
+    	this.sender = sender;
+    	this.recipient = recipient;
+    	this.data = data;
+    	this.timestamp = timestamp;
+    	this.txHash = txHash;
+    	this.txSignature = txSignature;
+    	this.isValid = isValid;
+    }
+    
+    public Transaction(Transaction transaction) {
+    	this(transaction.sender, transaction.recipient, transaction.data, transaction.timestamp, transaction.txHash, transaction.txSignature, transaction.isValid);
+    }
+    
     public String getSender() {
         return sender;
     }

@@ -74,7 +74,7 @@ public class BlockchainServiceImpl implements BlockchainService {
         
     	transaction.setTimestamp(util.getCurrentTimestamp().toString());
     	transaction.setTxHash(util.createSHA256(transaction.toString()));
-    	transaction.setTxSignature(util.signTransaction(keyFactory.generatePrivate(new PKCS8EncodedKeySpec(DatatypeConverter.parseBase64Binary(wallet.getPrivateKey()))), dataToEncrypt));
+    	transaction.setTxSignature(util.signDataViaPrivateKey(keyFactory.generatePrivate(new PKCS8EncodedKeySpec(DatatypeConverter.parseBase64Binary(wallet.getPrivateKey()))), dataToEncrypt));
     	blockchain.getOpenTransactions().add(transaction);
     	
     	JSONArray openTransactionsArray = new JSONArray();
@@ -103,7 +103,12 @@ public class BlockchainServiceImpl implements BlockchainService {
     	Block previousBlock = blockchain.getBlockchain().get(blockchain.getBlockchain().size() - 1);
     	
     	Block block = new Block();
-    	block.setTransactions(blockchain.getOpenTransactions());
+    	List<Transaction> transactions = new ArrayList<>();
+    	for(Transaction transaction : blockchain.getOpenTransactions()) {
+    		transactions.add(new Transaction(transaction));
+    	}
+    	
+    	block.setTransactions(transactions);
     	block.setPreviousBlock(previousBlock.getHash());
     	block.setHeight(previousBlock.getHeight() + 1);
     	block.setTimestamp(util.getCurrentTimestamp().toString());
@@ -172,7 +177,7 @@ public class BlockchainServiceImpl implements BlockchainService {
     	KeyFactory keyFactory = KeyFactory.getInstance("ECDSA","BC");
     	
     	String data = transaction.getSender() + transaction.getRecipient() + transaction.getData();
-	    if(util.verifySignedTransaction(keyFactory.generatePublic(new X509EncodedKeySpec(DatatypeConverter.parseBase64Binary(transaction.getSender()))), data, transaction.getTxSignature())) {
+	    if(util.verifySignedDataViaPublicKey(keyFactory.generatePublic(new X509EncodedKeySpec(DatatypeConverter.parseBase64Binary(transaction.getSender()))), data, transaction.getTxSignature())) {
 	    	isTransactionValid = true;
 	    }
 	    
