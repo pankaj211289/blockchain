@@ -49,13 +49,31 @@ public class BlockchainServiceImpl implements BlockchainService {
         		blocks.add(Block.init(blockChainJSONArray.getJSONObject(i)));
         	}
         	
-        	for(Block block: blocks) {
-        		block.setValid(verifyBlock(block));
+        	for(int i = 0; i < blocks.size(); i++) {
+        		Block block = blocks.get(i);
+        		
+        		boolean areAllTransactionsValid = true;
         		if(block.getTransactions() != null) {
-	        		for(Transaction transaction: block.getTransactions()) {
-	        		    transaction.setValid(verifyTransaction(transaction));
+        			List<Transaction> txList = block.getTransactions();
+	        		for(int j = 0; j < txList.size(); j++) {
+	        			txList.get(j).setValid(verifyTransaction(txList.get(j)));
+	        			
+	        			if(areAllTransactionsValid) {
+	        				areAllTransactionsValid = txList.get(j).isValid();
+	        			}
 	        		}
         		}
+        		
+        		if(!areAllTransactionsValid) {
+        			block.setValid(false);
+        			continue;
+        		}
+        		
+        		if(i > 0 && !blocks.get(i - 1).isValid()) {
+        			block.setValid(false);
+        			continue;
+        		}
+        		block.setValid(verifyBlock(block));
         	}
         	
         	return blocks;
