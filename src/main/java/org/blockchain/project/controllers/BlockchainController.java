@@ -55,14 +55,24 @@ public class BlockchainController {
     }
     
     @RequestMapping(value="/addTransaction", method=RequestMethod.POST)
-    public void addTransaction(@RequestBody Transaction transaction) throws JSONException, IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException {
+    public ResponseEntity<?> addTransaction(@RequestBody Transaction transaction) throws JSONException, IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException {
     	blockchainService.addTransaction(transaction);
+    	
+    	JSONObject successMessage = new JSONObject();
+        successMessage.put("message", "Transaction added to open transactions list");
+        
+        return new ResponseEntity<>(successMessage.toMap(), HttpStatus.ACCEPTED);
     }
     
     @RequestMapping(value="/mine", method=RequestMethod.POST)
-    public void addTransactionsToBlockchain() throws JSONException, IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException {
+    public ResponseEntity<?> addTransactionsToBlockchain() throws JSONException, IOException, NoSuchAlgorithmException, InvalidKeyException, NoSuchProviderException, SignatureException, InvalidKeySpecException {
     	blockchain.setDifficulty("00");
         blockchainService.addTransactionsToBlockchain();
+        
+        JSONObject successMessage = new JSONObject();
+        successMessage.put("message", "Transactions added to blockchain");
+        
+        return new ResponseEntity<>(successMessage.toMap(), HttpStatus.ACCEPTED);
     }
     
     @RequestMapping(value="/createWallet", method=RequestMethod.POST)
